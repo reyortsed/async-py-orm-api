@@ -2,9 +2,12 @@
 
 A starter RestAPI using FastAPI, SQLite and SQLAlchemy Async extension. Supports OpenAPI Specification v3.1 / Swagger Docs
 
-> This is my first serious adventure into the Python World, as I am in essence a .NET C# developer. > I have attempted to apply the design aspects of C# projects I have worked with, aswell as turning > on as strict typing as possible with PyLance (thats what I am used to)
+> This is my first serious adventure into the Python World, as I am in essence a .NET C# developer. 
+> I have attempted to apply the design aspects of C# projects I have worked with, aswell as turning
+> on as strict typing as possible with PyLance (thats what I am used to)
 > Any feedback in the form of comments / issues is appreciated. 
 > Please feel free to fork the project for your own purposes.
+
 ## Features
 
 - In this starter api, the following operations are supported (See Swagger Docs)
@@ -22,12 +25,14 @@ A starter RestAPI using FastAPI, SQLite and SQLAlchemy Async extension. Supports
  - SQLite (Not limited to)
 
 ## Installation
--- For a quick up and running dev version.
+
+### For a quick up and running dev version.
+
 - Clone the repo
 - Configure your python virtual env and activate
 - run pip install -r requirements.txt
 - Execute makecert.sh (requires shell with openssl). Generates a pub/priv pem and crt
-- Install the cert.crt in Trusted Root Certificates
+- If you need a trusted certificate, install the cert.crt in Trusted Root Certificates
 - Run main.py
 - Point your browser to https://localhost/docs
 - Swagger docs should show
