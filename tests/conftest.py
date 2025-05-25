@@ -3,9 +3,6 @@
 import pytest_asyncio  # ✅ needed to register async fixtures
 from httpx import AsyncClient
 from httpx import ASGITransport
-from fastapi import FastAPI
-from app.main import app as fastapi_app
-
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.main import app
@@ -15,7 +12,6 @@ from asgi_lifespan import LifespanManager
 from app.main import create_app
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
-app: FastAPI = fastapi_app  # type hint for Pylance
 
 app = create_app()
 
