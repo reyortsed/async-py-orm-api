@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, Depends
 from typing import List
-from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.schemas.user import *
 from app.services.user_service import UserService
 from app.services.dependencies import get_user_service
 from app.resources import responses
@@ -20,7 +20,7 @@ async def get_user(user_id: int, service: UserService = Depends(get_user_service
         return responses.user_not_found
     return user
 
-@router.post("/", response_model=UserRead)
+@router.post("/", response_model=UserCreateResponse)
 async def create_user(user_in: UserCreate, service: UserService = Depends(get_user_service)):
     user, created, response = await service.create_user_if_not_exists(user_in)
     if not created:

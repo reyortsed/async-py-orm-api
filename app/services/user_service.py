@@ -39,6 +39,7 @@ class UserService:
             return existing, False, responses.user_exists  # User already exists
 
     async def update_user(self, user_id: int, user_in: UserUpdate) -> tuple[User, bool, JSONResponse]:
+        user = None
         try:
             user = await self.repo.update(user_id, user_in)
             await self.db.commit()
