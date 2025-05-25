@@ -5,5 +5,5 @@ uvicorn
 pytest
 pytest-asyncio
 httpx
-pydantic[email]]
+pydantic[email]
 asgi_lifespan
