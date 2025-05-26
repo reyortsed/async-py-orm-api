@@ -40,12 +40,19 @@
     <Content Include="tests\__pycache__\test_users.cpython-313-pytest-8.3.5.pyc" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="app\controllers\course_controller.py" />
     <Compile Include="app\controllers\user_controller.py" />
+    <Compile Include="app\controllers\__init__.py" />
     <Compile Include="app\database.py" />
     <Compile Include="app\main.py" />
+    <Compile Include="app\models\course.py" />
+    <Compile Include="app\models\__init__.py" />
+    <Compile Include="app\repositories\course_repository.py" />
     <Compile Include="app\resources\responses.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="app\schemas\course.py" />
+    <Compile Include="app\schemas\__init__.py" />
     <Compile Include="app\services\dependencies.py">
       <SubType>Code</SubType>
     </Compile>
@@ -53,6 +60,7 @@
     <Compile Include="app\repositories\user_repository.py" />
     <Compile Include="app\schemas\user.py" />
     <Compile Include="app\services\user_service.py" />
+    <Compile Include="app\__init__.py" />
     <Compile Include="tests\conftest.py" />
     <Compile Include="tests\test_users.py" />
   </ItemGroup>

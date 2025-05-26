@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script>
+    const ws = new WebSocket("wss://localhost/ws");
+
+    ws.onopen = () => console.log("✅ Connected!");
+    ws.onmessage = event => console.log("📨 Message from server:", event.data);
+    ws.onerror = err => console.error("❌ WebSocket error:", err);
+  </script>
+</body>
+</html>

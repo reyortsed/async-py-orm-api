@@ -5,11 +5,11 @@ from httpx import AsyncClient
 from httpx import ASGITransport
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from app.main import app
+from main import app
 from app.database import Base, get_db
 from asgi_lifespan import LifespanManager
 
-from app.main import create_app
+from main import create_app
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
@@ -36,5 +36,5 @@ app.dependency_overrides[get_db] = override_get_db
 async def client():
     async with LifespanManager(app):
         transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
+        async with AsyncClient(transport=transport, base_url="https://localhost") as ac:
             yield ac

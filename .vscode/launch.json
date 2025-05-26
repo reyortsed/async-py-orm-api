@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "configurations": [
+     {
+      "name": "Debug FastAPI (No Reload)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "main:app",
+        "--host", "localhost",                 
+        "--port", "443",
+        "--ssl-keyfile", "key.pem",
+        "--ssl-certfile", "cert.pem"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Run FastAPI App",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "main",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "."
+      },
+      "args": []
+    }
+  ]
+}
