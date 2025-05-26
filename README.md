@@ -2,9 +2,10 @@
 
 A starter RestAPI using FastAPI, SQLite and SQLAlchemy Async extension. Supports OpenAPI Specification v3.1 / Swagger Docs
 
-> This is my first serious adventure into the Python World, as I am in essence a .NET C# developer. 
+> Although I coded a bit in Python 5-6 years ago, this is my first serious adventure into the Python World, as I am, for the most part,
+> a .NET C# developer.
 > I have attempted to apply the design aspects of C# projects I have worked with, aswell as turning
-> on as strict typing as possible with PyLance (thats what I am used to)
+> on as strict typing as possible with PyLance (thats what I am used to from the world of compiled languages)
 > Any feedback in the form of comments / issues is appreciated. 
 > Please feel free to fork the project for your own purposes.
 
@@ -16,10 +17,12 @@ A starter RestAPI using FastAPI, SQLite and SQLAlchemy Async extension. Supports
 - Update User
 - Delere User
 - List All Users
+- Test of Websocket features in FastAPI ASGI
 
 ## Tech
  - Python 3
- - FastAPI
+ - PyTest
+ - FastAPI (ASGI)
  - Swagger
  - SQLAlchemy 2.0 Async Extension
  - SQLite (Not limited to)
@@ -33,12 +36,20 @@ A starter RestAPI using FastAPI, SQLite and SQLAlchemy Async extension. Supports
 - run pip install -r requirements.txt
 - Execute makecert.sh (requires shell with openssl). Generates a pub/priv pem and crt
 - If you need a trusted certificate, install the cert.crt in Trusted Root Certificates
-- Run main.py
-- Point your browser to https://localhost/docs
+- The launch.json has a couple of configurations. One for regular debugging and one for a debug mode that supports attaching to process when using Websocket extension
+- You can run the pytests in tests, or simply launch the project. Should work in both vscode or visual studio, but make sure you are using the correct venv
+- Point your browser to https://localhost/docs for API
 - Swagger docs should show
+- Point your browser to https://localhost/wsclient for Websockets test (Note: when running with https, websocket must use wss protocol not ws, change the client connection string accordingly)
+
+# Tests
+
+- PyTests for most common API operations are performed
+- Recommend installeing the Python Test Explorer in VSCode for better visualisation
 
 # Hosting
 - FastAPI with async functionality requires the Python ASGI module, which is not supported by all popular web servers
+- For WebSocket support, you MUST use the uvicorn host.
 
 ## Standalone Servers supporting ASGI
  - Uvicorn
