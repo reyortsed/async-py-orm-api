@@ -182,3 +182,4 @@ pyrightconfig.json
 /async-py-orm-apis.pyproj.user
 /cert.crt
 /mypy.ini
+/test.db-journal

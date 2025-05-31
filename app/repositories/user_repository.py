@@ -14,7 +14,12 @@ class UserRepository:
         return result.scalars().all()
 
     async def get_by_id(self, user_id: int) -> Optional[User]:
-        return await self.db.get(User, user_id)
+        from sqlalchemy.orm import selectinload
+        from sqlalchemy.future import select
+        result = await self.db.execute(
+            select(User).options(selectinload(User.courses)).where(User.id == user_id)
+        )
+        return result.scalars().first()
 
     async def get_by_email(self, email: str) -> Optional[User]:
         return await self.db.get(User, email)

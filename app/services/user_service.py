@@ -3,12 +3,13 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.user_repository import UserRepository
+from app.schemas.course import CourseRead
 from app.schemas.user import UserCreate, UserUpdate
 from typing import Sequence, Optional
 from app.models.user import User
+from app.models.course import Course
 from app.resources import responses
-
-
+from app.schemas.user import UserWithCourses
 
 class UserService:
     def __init__(self, db: AsyncSession):
@@ -60,4 +61,51 @@ class UserService:
         except IntegrityError as ex:    
             await self.db.rollback()
             return JSONResponse(status_code=HTTPStatus.CONFLICT,content=str(ex.orig))
-        
+
+    async def add_course_to_user(self, user_id: int, course_id: int) -> UserWithCourses:
+        user = await self.repo.get_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        course = await self.db.get(Course, course_id)
+        if not course:
+            raise ValueError("Course not found")
+        if course not in user.courses:
+            user.courses.append(course)
+            await self.db.commit()
+            await self.db.refresh(user)
+        # Eager load courses for response
+        await self.db.refresh(user)
+        return UserWithCourses(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            courses=[CourseRead.model_validate(c, from_attributes=True) for c in user.courses]
+        )
+
+    async def get_user_with_courses(self, user_id: int) -> UserWithCourses:
+        user = await self.repo.get_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        await self.db.refresh(user)
+        return UserWithCourses(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            courses=[CourseRead.model_validate(c, from_attributes=True) for c in user.courses]
+        )
+
+    async def remove_course_from_user(self, user_id: int, course_id: int) -> UserWithCourses:
+        user = await self.repo.get_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        course = next((c for c in user.courses if c.id == course_id), None)
+        if course:
+            user.courses.remove(course)
+            await self.db.commit()
+            await self.db.refresh(user)
+        return UserWithCourses(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            courses=[CourseRead.model_validate(c, from_attributes=True) for c in user.courses]
+        )

@@ -3,10 +3,10 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from app.database import engine, Base
 from app.controllers import user_controller
+from app.controllers import course_controller
 import threading, webbrowser, time
 from contextlib import asynccontextmanager
 import uvicorn
-from app.controllers import user_controller
 from typing import List
 
 def open_browser():
@@ -32,6 +32,7 @@ def create_app(testing: bool = False) -> FastAPI:
         pass
 
     app.include_router(user_controller.router)
+    app.include_router(course_controller.router)
 
     return app    
 

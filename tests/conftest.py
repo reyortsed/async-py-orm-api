@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from main import app
 from app.database import Base, get_db
 from asgi_lifespan import LifespanManager
+import os
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from main import create_app
 
@@ -24,7 +26,6 @@ async def setup_db():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield
-    # No teardown needed for sqlite, but could truncate for other backends
 
 async def override_get_db():
     async with AsyncSessionLocalTest() as session:
