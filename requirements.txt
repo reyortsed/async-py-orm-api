@@ -7,3 +7,12 @@ pytest-asyncio
 httpx
 pydantic[email]
 asgi_lifespan
+python-jose
+types-python-jose
+passlib
+python-multipart
+slowapi
+requests
+types-requests
+aiosqlite
+python-dotenv

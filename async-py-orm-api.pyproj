@@ -21,6 +21,7 @@
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <TestFramework>Pytest</TestFramework>
+    <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +32,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".env.example" />
     <Content Include=".gitignore" />
     <Content Include="async-py-orm-apis.pyproj.user" />
     <Content Include="mypy.ini" />
@@ -40,6 +42,12 @@
     <Content Include="tests\__pycache__\test_users.cpython-313-pytest-8.3.5.pyc" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="app\auth\auth.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="app\auth\getClientToken.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\controllers\course_controller.py" />
     <Compile Include="app\controllers\user_controller.py" />
     <Compile Include="app\database.py" />
@@ -65,6 +73,7 @@
     <Folder Include="app\controllers\" />
     <Folder Include="app\models\" />
     <Folder Include="app\" />
+    <Folder Include="app\auth\" />
     <Folder Include="app\resources\" />
     <Folder Include="app\repositories\" />
     <Folder Include="app\schemas\" />
