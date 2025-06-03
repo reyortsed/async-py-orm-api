@@ -48,4 +48,7 @@ jobs:
     - name: Run integration tests
       run: pytest
       env:
+        TENANT_ID: ${{ secrets.TENANT_ID }}
+        API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         AZURE_TEST_TOKEN: ${{ env.AZURE_TEST_TOKEN }}
