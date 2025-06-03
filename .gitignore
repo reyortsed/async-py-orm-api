@@ -183,3 +183,4 @@ pyrightconfig.json
 /cert.crt
 /mypy.ini
 /test.db-journal
+/obj/Any CPU/Debug

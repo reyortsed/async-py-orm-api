@@ -5,9 +5,12 @@ import urllib.parse
 import webbrowser
 import requests
 
+# Identity provider config
 TENANT_ID = os.environ.get("TENANT_ID", "")
 API_CLIENT_ID = os.environ.get("API_CLIENT_ID", "")
-CLIENT_ID = os.environ.get("CLIENT_ID", "")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET", "")
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+JWKS_URL = f"{AUTHORITY}/discovery/v2.0/keys"
 
 # Callback URL for token request. 
 # This must match exacly with one of the client app callback urls
