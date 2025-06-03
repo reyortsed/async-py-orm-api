@@ -47,6 +47,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\auth\get_token.py" />
+    <Compile Include="app\common\config.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="app\common\__init__.py" />
     <Compile Include="app\controllers\course_controller.py" />
     <Compile Include="app\controllers\user_controller.py" />
     <Compile Include="app\database.py" />
@@ -75,6 +79,7 @@
     <Folder Include="app\models\" />
     <Folder Include="app\" />
     <Folder Include="app\auth\" />
+    <Folder Include="app\common\" />
     <Folder Include="app\resources\" />
     <Folder Include="app\repositories\" />
     <Folder Include="app\schemas\" />
