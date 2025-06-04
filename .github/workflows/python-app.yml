@@ -40,7 +40,7 @@ jobs:
     - name: Run integration tests
       run: pytest
       env:
-        TENANT_ID: ${{ env.TENANT_ID }}
-        API_APP_ID: ${{ env.API_APP_ID }}
-        CLIENT_APP_ID: ${{env.CLIENT_APP_ID}}
+        TENANT_ID: ${{ vars.TENANT_ID }}
+        API_APP_ID: ${{ vars.API_APP_ID }}
+        CLIENT_APP_ID: ${{vars.CLIENT_APP_ID}}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
