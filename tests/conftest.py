@@ -28,16 +28,16 @@ async def _fetch_azure_ad_token_client_credentials() -> str:
     Relies on TENANT_ID, CLIENT_APP_ID, CLIENT_SECRET, and API_APP_ID 
     being available in app.config.settings.
     """
-    token_url = f"https://login.microsoftonline.com/{config.get_env_or_secret("TENANT_ID")}/oauth2/v2.0/token"
+    token_url = f"https://login.microsoftonline.com/{config.get_env_or_secret('TENANT_ID')}/oauth2/v2.0/token"
     
     # For Client Credentials, the scope is typically for the application's permissions to the API
     # It's often the API's App ID URI followed by /.default
     # Ensure settings.API_APP_ID is the App ID URI of your target API
-    client_credentials_scope = f"{config.get_env_or_secret("API_APP_ID")}/.default" 
+    client_credentials_scope = f"{config.get_env_or_secret('API_APP_ID')}/.default" 
 
     data = {
-        "client_id": config.get_env_or_secret("CLIENT_APP_ID"), # The ID of the client application making the request
-        "client_secret": config.get_env_or_secret("CLIENT_SECRET"),
+        "client_id": config.get_env_or_secret('CLIENT_APP_ID'), # The ID of the client application making the request
+        "client_secret": config.get_env_or_secret('CLIENT_SECRET'),
         "scope": client_credentials_scope,
         "grant_type": "client_credentials",
     }
