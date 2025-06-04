@@ -4,6 +4,7 @@ import os
 import urllib.parse
 import webbrowser
 import requests
+from app.common import config
 
 # Identity provider config
 TENANT_ID = config.get_env_or_secret("TENANT_ID")
