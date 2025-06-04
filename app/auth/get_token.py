@@ -39,7 +39,7 @@ verifier, challenge = generate_pkce()
 auth_url = (
     f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/authorize?"
     + urllib.parse.urlencode({
-        "client_id": CLIENT_ID,
+        "client_id": CLIENT_APP_ID,
         "response_type": "code",
         "redirect_uri": REDIRECT_URI,
         "response_mode": "query",
@@ -60,7 +60,7 @@ code = input("\nPaste the opaque token from the redirect URL: ").strip()
 # Request the jwt
 token_url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
 data = {
-    "client_id": CLIENT_ID,
+    "client_id": CLIENT_APP_ID,
     "scope": SCOPE,
     "code": code,
     "redirect_uri": REDIRECT_URI,
