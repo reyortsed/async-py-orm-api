@@ -1,6 +1,7 @@
 {
   "version": "1.0",
   "configurations": [
+  
      {
       "name": "Debug FastAPI (No Reload)",
       "type": "debugpy",
