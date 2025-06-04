@@ -31,20 +31,10 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Get Azure AD Token
-      run: |
-        token=$(curl -s -X POST https://login.microsoftonline.com/${{ secrets.AZURE_TENANT_ID }}/oauth2/v2.0/token \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        -d "client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-        -d "client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-        -d "scope=${{ secrets.API_SCOPE }}" \
-        -d "grant_type=client_credentials" | jq -r .access_token)
-        echo "AZURE_TEST_TOKEN=$token" >> $GITHUB_ENV
-
     - name: Run integration tests
       run: pytest
       env:
-        TENANT_ID: ${{ secrets.TENANT_ID }}
-        API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
+        TENANT_ID: ${{ env.TENANT_ID }}
+        API_APP_ID: ${{ env.API_APP_ID }}
+        CLIENT_APP_ID: ${{env.CLIENT_APP_ID}}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        AZURE_TEST_TOKEN: ${{ env.AZURE_TEST_TOKEN }}
