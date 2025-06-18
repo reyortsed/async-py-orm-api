@@ -42,7 +42,7 @@ jobs:
     - name: Run Safety Scan
       run: |
         mkdir -p reports
-        safety scan -r requirements.txt --full-report --key ${{ secrets.SAFETY_API_KEY }} > reports/safety_report.txt
+        safety scan -r requirements.txt --full-report --key ${{ secrets.SAFETY_API_KEY }} --no-input > reports/safety_report.txt
         cat reports/safety_report.txt
 
     - name: Add Safety Scan results to summary
