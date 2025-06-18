@@ -42,25 +42,10 @@ jobs:
     - name: Static security scan with Bandit
       run: bandit -r . --exclude ./tests,.vscode,.github
 
-    - name: Run Safety in container and capture HTML output
-      env:
-        SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
-        SAFETY_DISABLE_TELEMETRY: "1"
-      run: |
-        docker run --rm \
-        -e SAFETY_API_KEY \
-        -e SAFETY_DISABLE_TELEMETRY \
-        -v $(pwd):/app \
-        -w /app \
-        pyupio/safety:latest \
-        safety check --full-report --json > ./reports/safety_report.json
-
-    - name: Add Safety scan summary (HTML snippet)
-      run: |
-        echo "## Safety Scan HTML Snippet" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`html" >> $GITHUB_STEP_SUMMARY
-        head -n 20 ./reports/safety_report.html >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+    - name: Run Safety CLI to check for vulnerabilities
+      uses: pyupio/safety-action@v1
+      with:
+        api-key: ${{ secrets.SAFETY_API_KEY }}
 
     - name: Run unit tests
       run: pytest
