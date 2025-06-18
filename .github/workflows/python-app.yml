@@ -42,7 +42,7 @@ jobs:
     - name: Dependency vulnerability check with Safety
       run: |
         pip freeze > requirements-locked.txt
-        safety scan --file=requirements-locked.txt --output text
+        safety scan --file=requirements-locked.txt --output screen
 
     - name: Run unit tests
       run: pytest tests/unit
