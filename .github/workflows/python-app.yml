@@ -41,6 +41,11 @@ jobs:
           echo "Failed to obtain token"
           exit 1
         fi
+        
+    - name: Show token length (without printing token)
+      run: |
+        LENGTH=$(cat ./secrets/token.txt | wc -c)
+        echo "Access token length: $LENGTH characters"
 
     - name: Install dependencies
       run: |
@@ -90,10 +95,12 @@ jobs:
 
     - name: Run OWASP ZAP scan
       run: |
+        TOKEN=$(cat ./secrets/token.txt)
         docker run --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
         -t http://localhost:8000/openapi.json \
         -w zap_warnings.md \
         -f openapi \
+        -z "injector.header=Authorization: Bearer $TOKEN"
         -I
 
     - name: Add ZAP results to summary
