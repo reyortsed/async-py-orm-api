@@ -48,8 +48,7 @@ jobs:
         SAFETY_DISABLE_TELEMETRY: "1"
       run: |
         safety scan --target . --output html > reports/safety_report.html
-        cat reports/safety_report.txt
-
+    
     - name: Add Safety Scan results to summary
       run: |
         echo "## Safety Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
