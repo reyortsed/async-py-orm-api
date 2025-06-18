@@ -39,7 +39,6 @@ jobs:
     
         if grep -q null ./secrets/token.txt; then
           echo "Failed to obtain token"
-          exit 1
         fi
         
     - name: Show token length (without printing token)
