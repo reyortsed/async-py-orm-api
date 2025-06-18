@@ -27,8 +27,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest bandit safety httpx uvicorn
+        python -m pip install -q --upgrade pip
+        pip install -q flake8 pytest bandit safety httpx uvicorn
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Lint with flake8
@@ -63,6 +63,9 @@ jobs:
         CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
+    - name: Pull ZAP image quietly
+      run: docker pull -q zaproxy/zap-stable
+      
     - name: Create writable temp directory
       run: mkdir -p zap-output && chmod 777 zap-output
 
