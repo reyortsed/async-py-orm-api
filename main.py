@@ -39,8 +39,7 @@ def create_app(testing: bool = False) -> FastAPI:
             description=app.description,
             routes=app.routes
         )
-        # Force OpenAPI version to 3.0.4
-        openapi_schema["openapi"] = "3.0.4"
+
         openapi_schema["components"]["securitySchemes"] = {
             "BearerAuth": {
                 "type": "http",
@@ -122,14 +121,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 await client.send_text(f"I took 2 seconds to read your message :) Hello from server at {datetime.now(timezone.utc).isoformat()}")
     except WebSocketDisconnect:
         connected_clients.remove(websocket)
-
-@app.get("/openapi.json", include_in_schema=False)
-def overridden_openapi():
-    return JSONResponse(get_openapi(
-        title=app.title,
-        version=app.version,
-        routes=app.routes
-    ))
 
 if __name__ == "__main__":
     threading.Thread(target=open_browser).start()
