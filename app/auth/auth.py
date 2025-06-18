@@ -11,7 +11,7 @@ AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 JWKS_URL = f"{AUTHORITY}/discovery/v2.0/keys"
 
 # Cache keys
-JWKS = requests.get(JWKS_URL).json()
+JWKS = requests.get(JWKS_URL, timeout=5).json()
 
 bearer_scheme = HTTPBearer()
 
