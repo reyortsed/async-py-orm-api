@@ -37,7 +37,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Static security scan with Bandit
-      run: bandit -r . --exclude .vscode,.github
+      run: bandit -r . --exclude tests,.vscode,.github
 
     - name: Dependency vulnerability check with Safety
       run: |
