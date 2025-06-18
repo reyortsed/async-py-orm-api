@@ -68,8 +68,12 @@ jobs:
         docker run --network host -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
           -t http://localhost:8000 -g gen.conf -r zap_report.html || true
 
-    - name: Upload ZAP report
-      uses: actions/upload-artifact@v4
-      with:
-        name: zap-report
-        path: zap_report.html
+    - name: Run OWASP ZAP scan
+      run: |
+        docker run --rm -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
+          -t http://localhost:8000 \
+          -w zap_warnings.md \
+          -I
+    - name: Show ZAP results
+      run: cat zap_warnings.md
+
