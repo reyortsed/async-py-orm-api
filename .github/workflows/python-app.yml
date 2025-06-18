@@ -65,7 +65,7 @@ jobs:
 
     - name: Run OWASP ZAP scan
       run: |
-        docker run --rm -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
+        docker run --rm -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
           -t http://0.0.0.0:8000 \
           -w zap_warnings.md \
           -f openapi \
