@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
     yield  
 
 def create_app(testing: bool = False) -> FastAPI:
-    app = FastAPI(title="PiggyTail", version="1.0.0", lifespan=lifespan, openapi_version="3.0.4")
+    app = FastAPI(title="PiggyTail", version="1.0.0", lifespan=lifespan)
 
     # Add Bearer Auth security scheme to OpenAPI docs
     from fastapi.openapi.utils import get_openapi
@@ -38,6 +38,8 @@ def create_app(testing: bool = False) -> FastAPI:
             description=app.description,
             routes=app.routes,
         )
+        # Force OpenAPI version to 3.0.4
+        openapi_schema["openapi"] = "3.0.4"
         openapi_schema["components"]["securitySchemes"] = {
             "BearerAuth": {
                 "type": "http",
