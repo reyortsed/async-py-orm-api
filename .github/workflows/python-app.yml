@@ -33,7 +33,7 @@ jobs:
         curl -s -X POST https://login.microsoftonline.com/${{ vars.TENANT_ID }}/oauth2/v2.0/token \
           -d "client_id=${{ vars.GH_ACTIONS_AZURE_CLIENT_ID }}" \
           -d "client_secret=${{ secrets.GH_ACTIONS_CLIENT_SECRET }}" \
-          -d "scope=${{ API_SCOPE }}" \
+          -d "scope=${{ vars.AZURE_API_SCOPE }}" \
           -d "grant_type=client_credentials" \
           | jq -r '.access_token' > ./secrets/token.txt
     
