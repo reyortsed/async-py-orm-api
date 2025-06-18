@@ -68,7 +68,7 @@ data = {
     "code_verifier": verifier,
 }
 
-resp = requests.post(token_url, data=data)
+resp = requests.post(token_url, data=data, timeout=5)
 resp.raise_for_status()
 
 tokens = resp.json()
