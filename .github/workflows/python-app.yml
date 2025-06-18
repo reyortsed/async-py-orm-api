@@ -100,7 +100,7 @@ jobs:
         -t http://localhost:8000/openapi.json \
         -w zap_warnings.md \
         -f openapi \
-        -z "auth.header=Authorization: Bearer $TOKEN"
+        -z "auth.header=Authorization: Bearer $TOKEN" \
         -I
 
     - name: Add ZAP results to summary
