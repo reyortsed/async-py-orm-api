@@ -42,7 +42,7 @@ jobs:
     - name: Dependency vulnerability check with Safety
       run: |
        pip freeze > requirements-locked.txt
-       safety scan --key $SAFETY_API_KEY --file=requirements-locked.txt --output screen
+       safety scan --key $SAFETY_API_KEY --no-input --file=requirements-locked.txt --output screen
       env:
        SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
 
