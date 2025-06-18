@@ -48,12 +48,12 @@ jobs:
         SAFETY_DISABLE_TELEMETRY: "1"
       run: |
         docker run --rm \
-          -e SAFETY_API_KEY \
-          -e SAFETY_DISABLE_TELEMETRY \
-          -v $(pwd):/app \
-          -w /app \
-          pyupio/safety:latest \
-          safety scan --output html --target /app > ./reports/safety_report.html
+        -e SAFETY_API_KEY \
+        -e SAFETY_DISABLE_TELEMETRY \
+        -v $(pwd):/app \
+        -w /app \
+        pyupio/safety:latest \
+        safety check --full-report --json > ./reports/safety_report.json
 
     - name: Add Safety scan summary (HTML snippet)
       run: |
