@@ -42,12 +42,11 @@ jobs:
     - name: Static security scan with Bandit
       run: bandit -r . --exclude ./tests,.vscode,.github
 
-    - name: Run Safety Scan and write report
-      env:
-        SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
-        SAFETY_DISABLE_TELEMETRY: "1"
-      run: |
-        safety scan --target . --output html > reports/safety_report.html
+    - name: Run Safety CLI to check for vulnerabilities
+      uses: pyupio/safety-action@v1
+      with:
+        api-key: ${{ secrets.SAFETY_API_KEY }}
+        args: --output html
     
     - name: Add Safety Scan results to summary
       run: |
