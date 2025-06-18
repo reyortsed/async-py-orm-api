@@ -39,11 +39,16 @@ jobs:
     - name: Static security scan with Bandit
       run: bandit -r . --exclude ./tests,.vscode,.github
 
-    - name: Run Safety CLI to check for vulnerabilities
-      uses: pyupio/safety-action@v1
-      with:
-        api-key: ${{ secrets.SAFETY_API_KEY }}
-        args: --detailed-output # To always see detailed output from this action
+    - name: Run Safety Scan
+      run: |
+        mkdir -p reports
+        safety scan -r requirements.txt --full-report --key ${{ secrets.SAFETY_API_KEY }} > reports/safety_report.txt
+        cat reports/safety_report.txt
+
+    - name: Add Safety Scan results to summary
+      run: |
+        echo "## Safety Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
+        cat reports/safety_report.txt >> $GITHUB_STEP_SUMMARY
 
     - name: Run unit tests
       run: pytest
@@ -78,5 +83,7 @@ jobs:
         -I
 
     - name: Add ZAP results to summary
-      run: cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
+      run: |
+        echo "## OWASP ZAP Dynamic Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
+        cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
 
