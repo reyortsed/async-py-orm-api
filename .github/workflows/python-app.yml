@@ -95,11 +95,10 @@ jobs:
     - name: Run OWASP ZAP scan
       run: |
         TOKEN=$(cat ./secrets/token.txt)  
-        docker run --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
         -t http://localhost:8000/openapi.json \
         -w zap_warnings.md \
         -f openapi \
-        -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}"  \
         -I
 
     - name: Add ZAP results to summary
