@@ -41,6 +41,7 @@ jobs:
           echo "Failed to obtain token"
           exit 1
         fi
+      
       env:
         TENANT_ID: ${{ vars.TENANT_ID }}
         CLIENT_ID: ${{ vars.GH_ACTIONS_AZURE_CLIENT_ID }}
