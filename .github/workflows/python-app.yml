@@ -39,10 +39,13 @@ jobs:
     - name: Static security scan with Bandit
       run: bandit -r . --exclude ./tests,.vscode,.github
 
-    - name: Run Safety Scan
+    - name: Run Safety Scan and write report
+      env:
+        SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+        SAFETY_DISABLE_TELEMETRY: "1"
       run: |
         mkdir -p reports
-        safety scan -r requirements.txt --full-report --key ${{ secrets.SAFETY_API_KEY }} --no-input > reports/safety_report.txt
+        safety scan -r requirements.txt --full-report --no-input > reports/safety_report.txt
         cat reports/safety_report.txt
 
     - name: Add Safety Scan results to summary
