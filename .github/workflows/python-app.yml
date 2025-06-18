@@ -66,10 +66,9 @@ jobs:
     - name: Run OWASP ZAP scan
       run: |
         docker run --rm --network host -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
-        -t http://localhost:8000 \
+        -t http://localhost:8000/openapi.json \
         -w zap_warnings.md \
         -f openapi \
-        -u http://localhost:8000/openapi.json \
         -I
 
     - name: Show ZAP results
