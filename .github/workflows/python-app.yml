@@ -63,16 +63,13 @@ jobs:
         CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
-    - name: Run OWASP ZAP Baseline Scan
-      run: |
-        docker run --network host -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-          -t http://localhost:8000 -g gen.conf -r zap_report.html || true
-
     - name: Run OWASP ZAP scan
       run: |
         docker run --rm -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-          -t http://localhost:8000 \
+          -t http://0.0.0.0:8000 \
           -w zap_warnings.md \
+          -f openapi \
+          -u http://0.0.0.0:8000/openapi.json \
           -I
     - name: Show ZAP results
       run: cat zap_warnings.md
