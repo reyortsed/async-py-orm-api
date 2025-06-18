@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Build And Test The API
 env:
   PYTHONPATH: .
@@ -11,36 +8,62 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     environment: Test
 
+    services:
+      redis:  # Remove if not needed, add other services if required
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest bandit safety httpx uvicorn
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Print API_APP_ID
-      run: echo "API_APP_ID is $API_APP_ID"
-      env:
-        API_APP_ID: ${{ env.API_APP_ID }}
-        
-    - name: Run integration tests
-      run: pytest
+
+    - name: Static security scan with Bandit
+      run: bandit -r .
+
+    - name: Dependency vulnerability check with Safety
+      run: |
+        pip freeze > requirements-locked.txt
+        safety check --file=requirements-locked.txt --full-report
+
+    - name: Run unit tests
+      run: pytest tests/unit
       env:
         TENANT_ID: ${{ vars.TENANT_ID }}
         API_APP_ID: ${{ vars.API_APP_ID }}
-        CLIENT_APP_ID: ${{vars.CLIENT_APP_ID}}
+        CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+
+    - name: Start FastAPI app in background
+      run: |
+        nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 10  # Give time for the app to start
+
+    - name: Run OWASP ZAP Baseline Scan
+      run: |
+        docker run --network host -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py \
+          -t http://localhost:8000 -g gen.conf -r zap_report.html || true
+
+    - name: Upload ZAP report
+      uses: actions/upload-artifact@v4
+      with:
+        name: zap-report
+        path: zap_report.html
