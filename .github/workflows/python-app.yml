@@ -46,12 +46,6 @@ jobs:
       uses: pyupio/safety-action@v1
       with:
         api-key: ${{ secrets.SAFETY_API_KEY }}
-        args: --output html
-    
-    - name: Add Safety Scan results to summary
-      run: |
-        echo "## Safety Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
-        cat reports/safety_report.html >> $GITHUB_STEP_SUMMARY
 
     - name: Run unit tests
       run: pytest
