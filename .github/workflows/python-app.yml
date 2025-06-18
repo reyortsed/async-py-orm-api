@@ -47,7 +47,7 @@ jobs:
        SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
 
     - name: Run unit tests
-      run: pytest tests/unit
+      run: pytest
       env:
         TENANT_ID: ${{ vars.TENANT_ID }}
         API_APP_ID: ${{ vars.API_APP_ID }}
