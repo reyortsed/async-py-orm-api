@@ -31,6 +31,9 @@ jobs:
         pip install -qq flake8 pytest bandit safety httpx uvicorn
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+    - name: Create shared reports directory
+      run: mkdir -p ./reports
+
     - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -44,14 +47,13 @@ jobs:
         SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
         SAFETY_DISABLE_TELEMETRY: "1"
       run: |
-        mkdir -p reports
-        safety scan -r requirements.txt --full-report --no-input > reports/safety_report.txt
-        cat reports/safety_report.txt
+        safety scan -r requirements.txt --full-report --no-input > ./reports/safety_report.txt
+        cat ./reports/safety_report.txt
 
     - name: Add Safety Scan results to summary
       run: |
         echo "## Safety Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
-        cat reports/safety_report.txt >> $GITHUB_STEP_SUMMARY
+        cat ./reports/safety_report.txt >> $GITHUB_STEP_SUMMARY
 
     - name: Run unit tests
       run: pytest
