@@ -18,13 +18,6 @@ jobs:
           - 6379:6379
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-
     - name: Get Azure AD access token (store only)
       id: get_token
       run: |
@@ -40,11 +33,17 @@ jobs:
         if grep -q null ./secrets/token.txt; then
           echo "Failed to obtain token"
         fi
-        
+
     - name: Show token length (without printing token)
       run: |
         LENGTH=$(cat ./secrets/token.txt | wc -c)
         echo "Access token length: $LENGTH characters"
+
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
@@ -54,6 +53,21 @@ jobs:
 
     - name: Create shared reports directory
       run: mkdir -p reports
+
+    - name: Start FastAPI app in background
+      run: |
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+      env:
+        TENANT_ID: ${{ vars.TENANT_ID }}
+        API_APP_ID: ${{ vars.API_APP_ID }}
+        CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+
+    - name: ZAP Scan
+      uses: zaproxy/action-api-scan@v0.9.0
+      with:
+        target: 'http://localhost:8000/openapi.json'
 
     - name: Lint with flake8
       run: |
@@ -76,21 +90,12 @@ jobs:
         CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
-    - name: Start FastAPI app in background
-      run: |
-        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
-        sleep 10
-      env:
-        TENANT_ID: ${{ vars.TENANT_ID }}
-        API_APP_ID: ${{ vars.API_APP_ID }}
-        CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
-        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-
-    - name: Pull ZAP image quietly
-      run: docker pull -q zaproxy/zap-stable
+    
+    #- name: Pull ZAP image quietly
+    #  run: docker pull -q zaproxy/zap-stable
       
-    - name: Create writable temp directory
-      run: mkdir -p zap-output && chmod 777 zap-output
+    #- name: Create writable temp directory
+    #  run: mkdir -p zap-output && chmod 777 zap-output
 
     #- name: Run OWASP ZAP scan
     #  run: |
@@ -108,13 +113,8 @@ jobs:
     #    cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
     #    cat zap-output/zap_report.html >> $GITHUB_STEP_SUMMARY
 
-    - name: ZAP Scan
-      uses: zaproxy/action-api-scan@v0.9.0
-      with:
-        target: 'http://localhost:8000/openapi.json'
+    
 
-    - name: Add ZAP results to summary
-      run: cat report_md.md >> $GITHUB_STEP_SUMMARY
     
         
 
