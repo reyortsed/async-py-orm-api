@@ -59,7 +59,7 @@ def create_app(testing: bool = False) -> FastAPI:
     @app.middleware("http")
     async def auth_middleware(request: Request, call_next):
         # Allow docs, openapi, and websocket endpoints without auth
-        if request.url.path.startswith("/docs") or request.url.path.startswith("/openapi") or request.url.path.startswith("/favicon.ico"):
+        if request.url.path.startswith("/") or request.url.path.startswith("/openapi") or request.url.path.startswith("/favicon.ico"):
             return await call_next(request)
         auth_header = request.headers.get("authorization")
         if not auth_header or not auth_header.lower().startswith("bearer "):
