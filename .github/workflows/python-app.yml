@@ -92,17 +92,32 @@ jobs:
     - name: Create writable temp directory
       run: mkdir -p zap-output && chmod 777 zap-output
 
-    - name: Run OWASP ZAP scan
-      run: |
-        TOKEN=$(cat ./secrets/token.txt)  
-        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
-        -t http://localhost:8000/openapi.json \
-        -w zap_warnings.md \
-        -f openapi \
-        -I
+    #- name: Run OWASP ZAP scan
+    #  run: |
+    #    TOKEN=$(cat ./secrets/token.txt)  
+    #    docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
+    #    -t http://localhost:8000/openapi.json \
+    #    -w zap_warnings.md \
+    #    -r zap_report.html \
+    #    -f openapi \
+    #    -I
+
+    #- name: Add ZAP results to summary
+    #  run: |
+    #    echo "## OWASP ZAP Dynamic Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
+    #    cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
+    #    cat zap-output/zap_report.html >> $GITHUB_STEP_SUMMARY
+
+    - name: ZAP Scan
+      uses: zaproxy/action-api-scan@v0.9.0
+      with:
+        target: 'http://localhost:8000/openapi.json'
 
     - name: Add ZAP results to summary
-      run: |
-        echo "## OWASP ZAP Dynamic Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
-        cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
+        cat report_md.md >> $GITHUB_STEP_SUMMARY
+    
+        
+
+    
+        
 
