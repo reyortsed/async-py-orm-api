@@ -114,7 +114,7 @@ jobs:
         target: 'http://localhost:8000/openapi.json'
 
     - name: Add ZAP results to summary
-        cat report_md.md >> $GITHUB_STEP_SUMMARY
+      run: cat report_md.md >> $GITHUB_STEP_SUMMARY
     
         
 
