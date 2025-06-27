@@ -95,8 +95,8 @@ stages:
       displayName: 'Check FastAPI /openapi.json response'
 
     - script: |
-        echo "Installing OWASP ZAP Docker image..."
-        docker pull owasp/zap2docker-stable
+        echo "Installing ZAPROXY Docker image..."
+        docker pull zaproxy/zap-stable
       displayName: 'Pull ZAP Docker Image'
 
     - script: |
