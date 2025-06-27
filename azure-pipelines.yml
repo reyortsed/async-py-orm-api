@@ -3,6 +3,14 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+
+
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
 parameters:
   - name: environment
     type: string
@@ -19,14 +27,7 @@ variables:
       - group: staging-variables
   - ${{ if eq(parameters.environment, 'prod') }}:
       - group: prod-variables
-
-trigger:
-  - main
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-variables:
+  
   PYTHONPATH: '.'
 
 stages:
