@@ -94,10 +94,21 @@ stages:
     - script: curl -I http://localhost:8000/openapi.json
       displayName: 'Check FastAPI /openapi.json response'
 
-    # Optional: Replace this with Docker-based ZAP if needed
     - script: |
-        echo "You must replace this with a Docker-based OWASP ZAP scan or a task script"
-      displayName: 'ZAP Scan Placeholder'
+              echo "Installing OWASP ZAP Docker image..."
+              docker pull owasp/zap2docker-stable
+            displayName: 'Pull ZAP Docker Image'
+
+          - script: |
+              echo "Running ZAP Baseline Scan..."
+              docker run --network="host" -v $(System.DefaultWorkingDirectory):/zap/wrk:rw owasp/zap2docker-stable zap-api-scan.py -t http://localhost:8000/openapi.json -r ZAP-Report.html
+            displayName: 'Run ZAP Baseline'
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/ZAP-Report.html'
+              artifactName: 'ZAP-Report'
+            displayName: 'Publish ZAP Report Artifact'
 
     - script: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
