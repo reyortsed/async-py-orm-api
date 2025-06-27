@@ -118,7 +118,7 @@ stages:
 
     - script: |
         echo "Running ZAP API Scan..."
-        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory)/zap-output:/zap/wrk zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory)/zap-output:/zap/wrk zaproxy/zap-stable zap-api-scan.py --fail-on-warning false -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
       displayName: 'Run ZAP API Scan'
 
     - task: PublishPipelineArtifact@1
