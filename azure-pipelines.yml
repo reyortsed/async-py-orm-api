@@ -89,20 +89,6 @@ stages:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
       displayName: 'Install Python requirements'
-  
-    # Cache npm (default location: ~/.npm)
-    - task: Cache@2
-      inputs:
-        key: 'node | "$(Agent.OS)" | package-lock.json'
-        restoreKeys: |
-          node | "$(Agent.OS)"
-        path: ~/.npm
-      displayName: 'Cache npm cache'
-
-    # Install Node dependencies (uses npm cache)
-    - script: |
-        npm ci
-      displayName: 'Install Node dependencies'
 
     - script: mkdir -p reports
       displayName: 'Create shared reports directory'
