@@ -49,8 +49,8 @@ stages:
         mkdir -p ./secrets
 
         curl -s -X POST https://login.microsoftonline.com/$(TENANT_ID)/oauth2/v2.0/token \
-          -d "client_id=$(GH_ACTIONS_AZURE_CLIENT_ID)" \
-          -d "client_secret=$(GH_ACTIONS_CLIENT_SECRET)" \
+          -d "client_id=$(DEVOPS_AZURE_CLIENT_ID)" \
+          -d "client_secret=$(DEVOPS_CLIENT_SECRET)" \
           -d "scope=$(AZURE_API_SCOPE)" \
           -d "grant_type=client_credentials" \
           | jq -r '.access_token' > ./secrets/token.txt
