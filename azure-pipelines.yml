@@ -3,6 +3,23 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+parameters:
+  - name: environment
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - staging
+      - prod
+
+variables:
+  - ${{ if eq(parameters.environment, 'dev') }}:
+      - group: dev-variables
+  - ${{ if eq(parameters.environment, 'staging') }}:
+      - group: staging-variables
+  - ${{ if eq(parameters.environment, 'prod') }}:
+      - group: prod-variables
+
 trigger:
   - main
 
