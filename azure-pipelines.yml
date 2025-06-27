@@ -21,13 +21,16 @@ parameters:
       - prod
 
 variables:
-  - ${{ if eq(parameters.environment, 'dev') }}:
-      group: dev-variables
-  - ${{ if eq(parameters.environment, 'staging') }}:
-      group: staging-variables
-  - ${{ if eq(parameters.environment, 'prod') }}:
-      group: prod-variables
-    
+  - name: variableGroupName
+    ${{ if eq(parameters.environment, 'dev') }}:
+      value: 'dev-variables'
+    ${{ if eq(parameters.environment, 'staging') }}:
+      value: 'staging-variables'
+    ${{ if eq(parameters.environment, 'prod') }}:
+      value: 'prod-variables'
+      
+  - group: ${{ variables.variableGroupName }}
+
   PYTHONPATH: '.'
 
 stages:
