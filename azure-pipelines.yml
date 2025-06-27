@@ -75,8 +75,34 @@ stages:
         versionSpec: '3.13'
         addToPath: true
 
-    - script: pip install -r requirements.txt
-      displayName: 'Install requirements'
+    # Cache Python pip download cache (default location: ~/.cache/pip)
+    - task: Cache@2
+      inputs:
+        key: 'python | "$(Agent.OS)" | requirements.txt'
+        restoreKeys: |
+          python | "$(Agent.OS)"
+        path: ~/.cache/pip
+      displayName: 'Cache pip download cache'
+  
+    # Install Python dependencies using default pip cache
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install Python requirements'
+  
+    # Cache npm (default location: ~/.npm)
+    - task: Cache@2
+      inputs:
+        key: 'node | "$(Agent.OS)" | package-lock.json'
+        restoreKeys: |
+          node | "$(Agent.OS)"
+        path: ~/.npm
+      displayName: 'Cache npm cache'
+
+    # Install Node dependencies (uses npm cache)
+    - script: |
+        npm ci
+      displayName: 'Install Node dependencies'
 
     - script: mkdir -p reports
       displayName: 'Create shared reports directory'
@@ -100,11 +126,8 @@ stages:
       displayName: 'Pull ZAP Docker Image'
 
     - script: |
-        uid=$(id -u)
-        gid=$(id -g)
-        echo "Host UID=$uid, GID=$gid" #We want the docker container to run as same uid and gid so it has writes to the zap report folder
         echo "Running ZAP API Scan..."
-        docker run --user $uid:$gid -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
       displayName: 'Run ZAP API Scan'
 
     - task: PublishPipelineArtifact@1
