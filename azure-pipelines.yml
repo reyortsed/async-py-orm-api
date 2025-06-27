@@ -31,7 +31,8 @@ variables:
       
   - group: ${{ variables.variableGroupName }}
 
-  PYTHONPATH: '.'
+  - name: PYTHONPATH
+    value: '.'
 
 stages:
 - stage: BuildAndTest
