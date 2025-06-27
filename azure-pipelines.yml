@@ -135,10 +135,10 @@ stages:
     - script: bandit -r . --exclude ./tests,.vscode,.github
       displayName: 'Run Bandit scan'
 
-    #- script: |
-    #    pip install safety
-    #    safety check --full-report --key=$(SAFETY_API_KEY)
-    #  displayName: 'Run Safety CLI'
+    - script: |
+        pip install safety
+        safety scan --full-report --key=$(SAFETY_API_KEY)
+      displayName: 'Run Safety CLI'
 
     - script: pytest
       displayName: 'Run Unit Tests'
