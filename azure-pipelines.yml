@@ -100,8 +100,11 @@ stages:
       displayName: 'Pull ZAP Docker Image'
 
     - script: |
+        uid=$(id -u)
+        gid=$(id -g)
+        echo "Host UID=$uid, GID=$gid" #We want the docker container to run as same uid and gid so it has writes to the zap report folder
         echo "Running ZAP API Scan..."
-        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
+        docker run --user $uid:$gid -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
       displayName: 'Run ZAP API Scan'
 
     - task: PublishPipelineArtifact@1
