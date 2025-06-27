@@ -100,9 +100,9 @@ stages:
       displayName: 'Pull ZAP Docker Image'
 
     - script: |
-        echo "Running ZAP Baseline Scan..."
-        docker run --network="host" -v $(System.DefaultWorkingDirectory):/zap/wrk:rw owasp/zap2docker-stable zap-api-scan.py -t http://localhost:8000/openapi.json -r ZAP-Report.html
-      displayName: 'Run ZAP Baseline'
+        echo "Running ZAP API Scan..."
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -t http://localhost:8000/openapi.json -r ZAP-Report.html
+      displayName: 'Run ZAP API Scan'
 
     - task: PublishPipelineArtifact@1
       inputs:
