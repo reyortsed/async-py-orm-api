@@ -112,8 +112,13 @@ stages:
       displayName: 'Pull ZAP Docker Image'
 
     - script: |
+        mkdir -p $(System.DefaultWorkingDirectory)/zap-output
+        chmod 777 $(System.DefaultWorkingDirectory)/zap-output
+      displayName: 'Create ZAP output folder'
+
+    - script: |
         echo "Running ZAP API Scan..."
-        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory):/zap/wrk:rw zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory)/zap-output:/zap/wrk zaproxy/zap-stable zap-api-scan.py -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
       displayName: 'Run ZAP API Scan'
 
     - task: PublishPipelineArtifact@1
