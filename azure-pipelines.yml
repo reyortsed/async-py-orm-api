@@ -22,12 +22,12 @@ parameters:
 
 variables:
   - ${{ if eq(parameters.environment, 'dev') }}:
-      - group: dev-variables
+    group: dev-variables
   - ${{ if eq(parameters.environment, 'staging') }}:
-      - group: staging-variables
+    group: staging-variables
   - ${{ if eq(parameters.environment, 'prod') }}:
-      - group: prod-variables
-  
+    group: prod-variables
+    
   PYTHONPATH: '.'
 
 stages:
