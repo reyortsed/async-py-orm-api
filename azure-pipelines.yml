@@ -137,7 +137,7 @@ stages:
 
     - script: |
         pip install safety
-        safety scan --full-report --key=$(SAFETY_API_KEY) --stage production
+        safety --stage production --key=$(SAFETY_API_KEY) scan --full-report 
       displayName: 'Run Safety CLI'
 
     - script: pytest
