@@ -5,6 +5,7 @@ on: workflow_dispatch
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   build:
@@ -18,21 +19,14 @@ jobs:
           - 6379:6379
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-
     - name: Get Azure AD access token (store only)
       id: get_token
       run: |
         mkdir -p ./secrets
     
         curl -s -X POST https://login.microsoftonline.com/${{ vars.TENANT_ID }}/oauth2/v2.0/token \
-          -d "client_id=${{ vars.GH_ACTIONS_AZURE_CLIENT_ID }}" \
-          -d "client_secret=${{ secrets.GH_ACTIONS_CLIENT_SECRET }}" \
+          -d "client_id=${{ vars.DEVOPS_AZURE_CLIENT_ID }}" \
+          -d "client_secret=${{ secrets.DEVOPS_CLIENT_SECRET }}" \
           -d "scope=${{ vars.AZURE_API_SCOPE }}" \
           -d "grant_type=client_credentials" \
           | jq -r '.access_token' > ./secrets/token.txt
@@ -40,20 +34,40 @@ jobs:
         if grep -q null ./secrets/token.txt; then
           echo "Failed to obtain token"
         fi
-        
+
     - name: Show token length (without printing token)
       run: |
         LENGTH=$(cat ./secrets/token.txt | wc -c)
         echo "Access token length: $LENGTH characters"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install -qq --upgrade pip
-        pip install -qq flake8 pytest bandit safety httpx uvicorn
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+    - run: pip install -r requirements.txt
 
     - name: Create shared reports directory
       run: mkdir -p reports
+
+    - name: Start FastAPI app in background
+      run: |
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+      env:
+        TENANT_ID: ${{ vars.TENANT_ID }}
+        API_APP_ID: ${{ vars.API_APP_ID }}
+        CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    
+    - name: Check response headers
+      run: |
+        curl -I http://localhost:8000/openapi.json
+
+    - name: ZAP Scan
+      uses: zaproxy/action-api-scan@v0.9.0
+      with:
+        target: 'http://localhost:8000/openapi.json'
 
     - name: Lint with flake8
       run: |
@@ -76,33 +90,34 @@ jobs:
         CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
-    - name: Start FastAPI app in background
-      run: |
-        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
-        sleep 10
-      env:
-        TENANT_ID: ${{ vars.TENANT_ID }}
-        API_APP_ID: ${{ vars.API_APP_ID }}
-        CLIENT_APP_ID: ${{ vars.CLIENT_APP_ID }}
-        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-
-    - name: Pull ZAP image quietly
-      run: docker pull -q zaproxy/zap-stable
+    
+    #- name: Pull ZAP image quietly
+    #  run: docker pull -q zaproxy/zap-stable
       
-    - name: Create writable temp directory
-      run: mkdir -p zap-output && chmod 777 zap-output
+    #- name: Create writable temp directory
+    #  run: mkdir -p zap-output && chmod 777 zap-output
 
-    - name: Run OWASP ZAP scan
-      run: |
-        TOKEN=$(cat ./secrets/token.txt)  
-        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
-        -t http://localhost:8000/openapi.json \
-        -w zap_warnings.md \
-        -f openapi \
-        -I
+    #- name: Run OWASP ZAP scan
+    #  run: |
+    #    TOKEN=$(cat ./secrets/token.txt)  
+    #    docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(pwd)/zap-output:/zap/wrk/:rw -t zaproxy/zap-stable zap-api-scan.py \
+    #    -t http://localhost:8000/openapi.json \
+    #    -w zap_warnings.md \
+    #    -r zap_report.html \
+    #    -f openapi \
+    #    -I
 
-    - name: Add ZAP results to summary
-      run: |
-        echo "## OWASP ZAP Dynamic Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
-        cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
+    #- name: Add ZAP results to summary
+    #  run: |
+    #    echo "## OWASP ZAP Dynamic Scan Vulnerability Report" >> $GITHUB_STEP_SUMMARY
+    #    cat zap-output/zap_warnings.md >> $GITHUB_STEP_SUMMARY
+    #    cat zap-output/zap_report.html >> $GITHUB_STEP_SUMMARY
+
+    
+
+    
+        
+
+    
+        
 

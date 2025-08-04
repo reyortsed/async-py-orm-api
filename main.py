@@ -12,11 +12,6 @@ from contextlib import asynccontextmanager
 import uvicorn
 from typing import List
 from fastapi.openapi.utils import get_openapi
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
-from starlette.middleware.cors import CORSMiddleware
-
-
 
 def open_browser():
     time.sleep(1)

@@ -16,3 +16,6 @@ requests
 types-requests
 aiosqlite
 python-dotenv
+flake8
+bandit
+safety

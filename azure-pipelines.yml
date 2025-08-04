@@ -1,0 +1,150 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+
+
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+  - name: environment
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - staging
+      - prod
+
+variables:
+  - name: variableGroupName
+    ${{ if eq(parameters.environment, 'dev') }}:
+      value: 'dev-variables'
+    ${{ if eq(parameters.environment, 'staging') }}:
+      value: 'staging-variables'
+    ${{ if eq(parameters.environment, 'prod') }}:
+      value: 'prod-variables'
+      
+  - group: ${{ variables.variableGroupName }}
+
+  - name: PYTHONPATH
+    value: '.'
+
+stages:
+- stage: BuildAndTest
+  displayName: 'Build and Test the API'
+  jobs:
+  - job: Build
+    displayName: 'Build and Lint'
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    steps:
+    - checkout: self
+
+    - script: |
+        mkdir -p ./secrets
+
+        curl -s -X POST https://login.microsoftonline.com/$(TENANT_ID)/oauth2/v2.0/token \
+          -d "client_id=$(DEVOPS_AZURE_CLIENT_ID)" \
+          -d "client_secret=$(DEVOPS_CLIENT_SECRET)" \
+          -d "scope=$(AZURE_API_SCOPE)" \
+          -d "grant_type=client_credentials" \
+          | jq -r '.access_token' > ./secrets/token.txt
+
+        if grep -q null ./secrets/token.txt; then
+          echo "Failed to obtain token"
+          exit 1
+        fi
+      displayName: 'Get Azure AD Access Token'
+
+    - script: |
+        LENGTH=$(cat ./secrets/token.txt | wc -c)
+        echo "Access token length: $LENGTH characters"
+      displayName: 'Show token length'
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.13'
+        addToPath: true
+
+    # Cache Python pip download cache (default location: ~/.cache/pip)
+    - task: Cache@2
+      inputs:
+        key: 'python | "$(Agent.OS)" | requirements.txt'
+        restoreKeys: |
+          python | "$(Agent.OS)"
+        path: ~/.cache/pip
+      displayName: 'Cache pip download cache'
+  
+    # Install Python dependencies using default pip cache
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install Python requirements'
+
+    - script: mkdir -p reports
+      displayName: 'Create shared reports directory'
+
+    - script: |
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+      displayName: 'Start FastAPI App'
+      env:
+        TENANT_ID: $(TENANT_ID)
+        API_APP_ID: $(API_APP_ID)
+        CLIENT_APP_ID: $(CLIENT_APP_ID)
+        CLIENT_SECRET: $(CLIENT_SECRET)
+
+    - script: curl -I http://localhost:8000/openapi.json
+      displayName: 'Check FastAPI /openapi.json response'
+
+    - script: |
+        echo "Installing ZAPROXY Docker image..."
+        docker pull zaproxy/zap-stable
+      displayName: 'Pull ZAP Docker Image'
+
+    - script: |
+        mkdir -p $(System.DefaultWorkingDirectory)/zap-output
+        chmod 777 $(System.DefaultWorkingDirectory)/zap-output
+      displayName: 'Create ZAP output folder'
+
+    - script: |
+        echo "Running ZAP API Scan..."
+        docker run -e ZAP_AUTH_HEADER_VALUE="Bearer ${TOKEN}" --rm --network host -v $(System.DefaultWorkingDirectory)/zap-output:/zap/wrk zaproxy/zap-stable zap-api-scan.py -I -f openapi -t http://localhost:8000/openapi.json -r ZAP-Report.html
+      displayName: 'Run ZAP API Scan'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(System.DefaultWorkingDirectory)/zap-output/ZAP-Report.html'
+        artifactName: 'ZAP-Report'
+      displayName: 'Publish ZAP Report Artifact'
+
+    - script: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      displayName: 'Lint with flake8'
+
+    - script: bandit -r . --exclude ./tests,.vscode,.github
+      displayName: 'Run Bandit scan'
+
+    - script: |
+        pip install safety
+        safety --stage production --key=$(SAFETY_API_KEY) scan --full-report 
+      displayName: 'Run Safety CLI'
+
+    - script: pytest
+      displayName: 'Run Unit Tests'
+      env:
+        TENANT_ID: $(TENANT_ID)
+        API_APP_ID: $(API_APP_ID)
+        CLIENT_APP_ID: $(DEVOPS_AZURE_CLIENT_ID)
+        CLIENT_SECRET: $(DEVOPS_CLIENT_SECRET)
+
