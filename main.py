@@ -1,9 +1,12 @@
 from datetime import datetime, timezone
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 import app
 from app.auth.auth import verify_token
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.controllers import user_controller
 from app.controllers import course_controller
